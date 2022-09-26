@@ -21,16 +21,16 @@
 
 - 搭建满足如下拓扑图所示的虚拟机网络拓扑；
 
-  ![img](https://c4pr1c3.github.io/cuc-ns/chap0x01/attach/chap0x01/media/vb-exp-layout.png)
+  ![topological_graph](img/topological_graph.jpg)
 
 > 根据实验宿主机的性能条件，可以适度精简靶机数量
 
 - 完成以下网络连通性测试；
-  - [√ ] 靶机可以直接访问攻击者主机
-  - [√ ] 攻击者主机无法直接访问靶机
-  - [√ ] 网关可以直接访问攻击者主机和靶机
-  - [√ ] 靶机的所有对外上下行流量必须经过网关
-  - [√ ] 所有节点均可以访问互联网
+  - - [x] 靶机可以直接访问攻击者主机
+  - - [x] 攻击者主机无法直接访问靶机
+  - - [x] 网关可以直接访问攻击者主机和靶机
+  - - [x]  靶机的所有对外上下行流量必须经过网关
+  - - [x] 所有节点均可以访问互联网
 
 ## 实验步骤
 
@@ -46,12 +46,12 @@
 
 **网关（Debian-gateway）**
 
-| 网卡  |                     设置                      |
-| :---: | :-------------------------------------------: |
-| 网卡1 | 网络地址转换，NAT网络，实现与外部攻击者的联系 |
-| 网卡2 |              仅主机（Host-Only）              |
-| 网卡3 |           内部网络，局域网internet1           |
-| 网卡4 |           内部网络，局域网internet2           |
+| 网卡  |                     设置                     |
+| :---: | :------------------------------------------: |
+| 网卡1 | NAT网络（非NAT网络），实现与外部攻击者的联系 |
+| 网卡2 |             仅主机（Host-Only）              |
+| 网卡3 |          内部网络，局域网internet1           |
+| 网卡4 |          内部网络，局域网internet2           |
 
 ![gateway_network_card](img/gateway_network_card.jpg)
 
@@ -117,7 +117,7 @@
 
 3.4靶机的所有对外上下行流量必须经过网关
 
-靶机ping互联网，用网管抓包，如果靶机发送的所有包都能被网关抓到则得证。
+靶机ping互联网，用网关抓包，如果靶机发送的所有包都能被网关抓到则得证。
 
 ```bash
   # 网关抓包
@@ -126,8 +126,11 @@
   # tcpdump更新
   $ apt update && aptinstall tmux
   
-  # 抓包
+  # 抓包参考
   $ tcpdump -i enp0s9 -n -w 20210908.1.pcap
+  
+  # 抓包操作
+  $ tcpdump -i enp0s9 -n -2 20220923.1.pcap
 ```
 
 - 局域网1靶机
@@ -181,3 +184,11 @@
 - [多重加载功能介绍](https://blog.csdn.net/Jeanphorn/article/details/45056251)
 - [Host-Only网卡配置](https://www.likecs.com/show-203630914.html)
 - [无法ping通时一些小tips](https://blog.csdn.net/a17377298306/article/details/104829017)
+- [NAT网络](https://www.yisu.com/zixun/63512.html)
+- [Lychee](https://github.com/CUCCS/2021-ns-public-Lychee00/blob/chap0x01/chap0x01/report01.md)
+
+## 修改
+
+- 网关和攻击者错配置为NAT网卡而非NAT网络，但之前的连通性测试并未受到影响，查询资料得知二者均有提供外部公网IP地址的作用，但NAT网络为提前创建好网络以供后续选择。将网关与攻击者更改为NAT网络（图片中粉色部分标注为修改部分）
+- 删除图片外链、更改了笔误以及Markdown标明列表项完成时打对勾的方式
+- 在进行抓包操作`tcpdump -i enp0s9 -n -w 20220923.1.pcap`时文中所引用为师姐作业中代码块（参考资料内补充了师姐的仓库链接），仅作参考使用所以忘记更新为自己的文件名，在后面补充了一条更改为自己文件的代码用以与图片所显示结果相同
